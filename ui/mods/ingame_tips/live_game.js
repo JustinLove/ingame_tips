@@ -3,24 +3,52 @@
 
   var sample = null
   var previousSample = null
-  var actions = 0
+  var lastTime = 0
+  var pollingPeriod = 10
+  var minimumTipTime = 60
+  var maximumTipTime = 5 * 60
+  var longTermMinimum = minimumTipTime
+
+  var resetTimer = function() {
+    lastTime = new Date().getTime()
+    longTermMinimum = minimumTipTime
+  }
+  resetTimer()
+
+  var timeSinceLastTip = function() {
+    return (new Date().getTime() - lastTime) / 1000
+  }
+
+  var genericTip = function() {
+    console.log('tip')
+    resetTimer()
+  }
 
   var processStats = function(string) {
+    if (model.armyIndex() < 0) return
+
     var payload = JSON.parse(string)
     previousSample = sample
     sample = payload.armies[model.armyIndex()]
     if (previousSample) {
-      actions = sample.commands_given - previousSample.commands_given
-      console.log(actions)
+      var commands = sample.commands_given - previousSample.commands_given
+      longTermMinimum = longTermMinimum + commands
+      var commandRate = 60 * commands / pollingPeriod
+      var t = timeSinceLastTip() - commandRate
+      //console.log(t, longTermMinimum, commandRate)
+      if (t > longTermMinimum || t > maximumTipTime) {
+        genericTip()
+      }
     }
   }
   model.queryStats = function() {
+    if (model.armyIndex() < 0) return
     api.gamestats.get(endOfTime()).then(processStats);
   }
 
   var poll = function() {
     model.queryStats()
-    setTimeout(poll, 10 * 1000)
+    setTimeout(poll, pollingPeriod * 1000)
   }
   poll()
 
