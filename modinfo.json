@@ -1,0 +1,20 @@
+{
+  "author": "wondible",
+  "build": "80462",
+  "category": ["in-game", "ui"],
+  "context": "client",
+  "date": "2015/05/19",
+  "description": "Tips and tricks to play the game, in context where possible.",
+  "display_name": "Ingame Tips",
+  "forum": null,
+  "identifier": "com.wondible.pa.ingame_tips",
+  "priority": 100,
+  "scenes": {
+    "live_game": [
+      "coui://ui/mods/ingame_tips/live_game.js"
+    ]
+  },
+  "signature": "not yet implemented",
+  "version": "0.1.0"
+}
+
