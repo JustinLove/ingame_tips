@@ -11,7 +11,7 @@
   "priority": 100,
   "scenes": {
     "live_game": [
-      "coui://ui/mods/ingame_tips/live_game.js"
+      "coui://ui/mods/ingame_tips/live_game_bootstrap.js"
     ]
   },
   "signature": "not yet implemented",

@@ -1,11 +1,15 @@
-(function() {
+define([
+], function(
+) {
+  "use strict";
+
   var endOfTime = ko.observable(0)
 
   var sample = null
   var previousSample = null
   var lastTime = 0
   var pollingPeriod = 10
-  var minimumTipTime = 60
+  var minimumTipTime = 10
   var maximumTipTime = 5 * 60
   var longTermMinimum = minimumTipTime
 
@@ -57,4 +61,4 @@
     live_game_time(payload)
     endOfTime(Math.floor(payload.end_time));
   }
-})()
+})
