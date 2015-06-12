@@ -3,12 +3,7 @@ define([
 ) {
   "use strict";
 
-  var endOfTime = ko.observable(0)
-
-  var sample = null
-  var previousSample = null
   var lastTime = 0
-  var pollingPeriod = 10
   var minimumTipTime = 10
   var maximumTipTime = 5 * 60
   var longTermMinimum = minimumTipTime
@@ -28,6 +23,21 @@ define([
     resetTimer()
   }
 
+  var commandRatePromise = $.Deferred()
+  var commandRate = commandRatePromise.promise()
+  commandRate.progress(function(rate) {
+    longTermMinimum = longTermMinimum + rate
+    var t = timeSinceLastTip() - rate
+    //console.log(t, longTermMinimum, rate)
+    if (t > longTermMinimum || t > maximumTipTime) {
+      genericTip()
+    }
+  })
+
+  var endOfTime = ko.observable(0)
+  var sample = null
+  var previousSample = null
+  var pollingPeriod = 10
   var processStats = function(string) {
     if (model.armyIndex() < 0) return
 
@@ -36,13 +46,7 @@ define([
     sample = payload.armies[model.armyIndex()]
     if (previousSample) {
       var commands = sample.commands_given - previousSample.commands_given
-      longTermMinimum = longTermMinimum + commands
-      var commandRate = 60 * commands / pollingPeriod
-      var t = timeSinceLastTip() - commandRate
-      //console.log(t, longTermMinimum, commandRate)
-      if (t > longTermMinimum || t > maximumTipTime) {
-        genericTip()
-      }
+      commandRatePromise.notify(60 * commands / pollingPeriod)
     }
   }
   model.queryStats = function() {
@@ -61,4 +65,5 @@ define([
     live_game_time(payload)
     endOfTime(Math.floor(payload.end_time));
   }
+
 })
