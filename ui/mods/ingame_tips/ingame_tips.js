@@ -4,6 +4,12 @@ define([
   "use strict";
 
   var viewModel = {
+    text: ko.observable(''),
+  }
+
+  handlers.ingame_tips_state = function(payload) {
+    console.log(payload)
+    viewModel.text(payload.text)
   }
 
   return {

@@ -6,6 +6,7 @@
   // make the object keys exist for Panel.ready
   var ingame_tips_stub = function() {}
   _.defaults(handlers, {
+    ingame_tips_hello: ingame_tips_stub,
   })
 })()
 
