@@ -33,7 +33,7 @@ define([
   model.gameOverState.subscribe(function(state) {
     if (!state) return
     if (state.defeated || state.game_over) {
-      viewModel.visible(false)
+      hide()
     }
   })
 
@@ -53,15 +53,24 @@ define([
     sendState()
   }
 
+  var timeout
+
   var present = function(text) {
     viewModel.visible(true)
     viewModel.text(text)
     sendState()
+    clearTimeout(timeout)
+    timeout = setTimeout(hide, 10000)
+  }
+
+  var hide = function() {
+    viewModel.visible(false)
   }
 
   return {
     insert: insert,
     present: present,
+    hide: hide,
     viewModel: viewModel
   }
 })
