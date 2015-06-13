@@ -4,11 +4,13 @@ define([
   "use strict";
 
   var viewModel = {
+    visible: ko.observable(false),
     text: ko.observable(''),
   }
 
   handlers.ingame_tips_state = function(payload) {
-    console.log(payload)
+    console.log(payload, viewModel.visible())
+    viewModel.visible(payload.visible)
     viewModel.text(payload.text)
   }
 

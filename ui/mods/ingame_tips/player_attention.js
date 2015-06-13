@@ -1,5 +1,7 @@
 define([
+  'ingame_tips/present',
 ], function(
+  present
 ) {
   "use strict";
 
@@ -19,7 +21,7 @@ define([
   }
 
   var genericTip = function() {
-    console.log('tip')
+    present.present("Generic Tip")
     resetTimer()
   }
 

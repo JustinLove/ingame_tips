@@ -65,6 +65,7 @@ define([
 
   var hide = function() {
     viewModel.visible(false)
+    sendState()
   }
 
   return {
