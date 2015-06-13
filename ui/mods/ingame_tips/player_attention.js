@@ -1,7 +1,9 @@
 define([
   'ingame_tips/present',
+  'ingame_tips/tip_catalog',
 ], function(
-  present
+  present,
+  catalog
 ) {
   "use strict";
 
@@ -21,7 +23,8 @@ define([
   }
 
   var genericTip = function() {
-    present.present("Generic Tip")
+    var i = Math.floor(Math.random() * catalog.tips.length)
+    present.present(catalog.tips[i].text)
     resetTimer()
   }
 

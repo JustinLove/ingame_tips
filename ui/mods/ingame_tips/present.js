@@ -60,7 +60,8 @@ define([
     viewModel.text(text)
     sendState()
     clearTimeout(timeout)
-    timeout = setTimeout(hide, 10000)
+    console.log(text.length)
+    timeout = setTimeout(hide, Math.max(10000, text.length * 200))
   }
 
   var hide = function() {
