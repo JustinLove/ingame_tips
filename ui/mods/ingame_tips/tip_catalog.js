@@ -31,7 +31,7 @@ define([
       },
       {
         id: 'transport-area',
-        text: 'With a group of transport selected, use the load command with an area command (click and drag) to quickly load many units.',
+        text: 'With a group of transports selected, use the load command with an area command (click and drag) to quickly load many units.',
       },
       {
         id: 'teleporter-restrictions',
