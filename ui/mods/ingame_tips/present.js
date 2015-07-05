@@ -5,8 +5,8 @@ define([
 ) {
   "use strict";
 
-  var panelX = ko.observable(200)
-  var panelY = ko.observable(30)
+  var panelX = ko.observable(500)
+  var panelY = ko.observable(100)
 
   var viewModel = {
     visible: ko.observable(false),
