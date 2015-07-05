@@ -28,18 +28,24 @@ define([
     resetTimer()
   }
 
+  var triggeredTip = function(tip) {
+    if (timeSinceLastTip() > minimumTipTime) {
+      present.present(tip.text)
+      resetTimer()
+      triggered = null
+    } else {
+      triggered = tip
+    }
+  }
+
   var tick = function(rate, period) {
     longTermMinimum = longTermMinimum + rate
     var t = timeSinceLastTip() - rate
     //console.log(t, longTermMinimum, rate)
-    if (t > longTermMinimum || t > maximumTipTime) {
-      if (triggered) {
-        present.present(triggered.text)
-        triggered = null
-        resetTimer()
-      } else {
-        genericTip()
-      }
+    if (triggered && t > minimumTipTime) {
+      triggeredTip(triggered)
+    } else if (t > longTermMinimum || t > maximumTipTime) {
+      genericTip()
     }
   }
 
@@ -49,7 +55,7 @@ define([
       ko.computed(function() {
         if (tip.trigger()) {
           console.log(tip.text)
-          triggered = tip
+          triggeredTip(tip)
         }
       })
     }
