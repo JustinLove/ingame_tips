@@ -3,11 +3,42 @@ define([
 ) {
   "use strict";
 
+  var singleBuildSequence = ko.observableArray([])
+  var lastBuiltTime = new Date().getTime()
+
+  var live_game_build_bar_build = handlers['build_bar.build']
+  handlers['build_bar.build'] = function(params) {
+    live_game_build_bar_build(params)
+    if (!model.selectedMobile()) {
+      var t = new Date().getTime()
+      if (params.urgent || params.batch) {
+        singleBuildSequence([])
+      } else if (t - lastBuiltTime < 2000) {
+        singleBuildSequence.unshift(params)
+      } else {
+        singleBuildSequence([params])
+      }
+      lastBuiltTime = t
+    }
+  }
+
   return {
     tips: [
       {
         id: 'shift-build',
         text: 'Shift-click factory build icons to add five units.',
+        trigger: function() {
+          if (singleBuildSequence().length < model.batchBuildSize()) return false
+
+          var ids = singleBuildSequence.slice(model.batchBuildSize()).map(function(action) {return action.item})
+          for (var i = 1;i < ids.length;i++) {
+            if (ids[i] != ids[0]) {
+              return false
+            }
+          }
+
+          return true
+        },
       },
       {
         id: 'continuous-build',

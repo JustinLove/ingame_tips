@@ -16,7 +16,7 @@ define([
     var payload = JSON.parse(string)
     previousSample = sample
     sample = payload.armies[model.armyIndex()]
-    if (previousSample) {
+    if (previousSample && previousSample.unit_count > 0) {
       var commands = sample.commands_given - previousSample.commands_given
       commandRatePromise.notify(60 * commands / pollingPeriod, pollingPeriod)
     }

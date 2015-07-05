@@ -33,9 +33,27 @@ define([
     var t = timeSinceLastTip() - rate
     //console.log(t, longTermMinimum, rate)
     if (t > longTermMinimum || t > maximumTipTime) {
-      genericTip()
+      if (triggered) {
+        present.present(triggered.text)
+        triggered = null
+        resetTimer()
+      } else {
+        genericTip()
+      }
     }
   }
+
+  var triggered
+  catalog.tips.forEach(function(tip) {
+    if (tip.trigger) {
+      ko.computed(function() {
+        if (tip.trigger()) {
+          console.log(tip.text)
+          triggered = tip
+        }
+      })
+    }
+  })
 
   return {
     tick: tick,
