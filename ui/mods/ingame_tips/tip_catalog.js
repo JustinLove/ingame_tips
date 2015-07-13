@@ -5,7 +5,9 @@ define([
 
   var singleBuildSequence = ko.observableArray([])
   var unitBuildSequence = ko.observableArray([])
+  var commandSequence = ko.observableArray([])
   var lastBuiltTime = new Date().getTime()
+  var lastCommandTime = new Date().getTime()
 
   var live_game_build_bar_build = handlers['build_bar.build']
   handlers['build_bar.build'] = function(params) {
@@ -16,6 +18,12 @@ define([
         singleBuildSequence([])
         unitBuildSequence([])
       }
+      if (t - lastCommandTime > 2000) {
+        commandSequence([])
+      }
+      var c = commandSequence()
+      c.unshift('build')
+      commandSequence(c)
       if (params.urgent) {
         singleBuildSequence([])
         unitBuildSequence.unshift(params)
@@ -31,7 +39,28 @@ define([
         unitBuildSequence.unshift(params)
       }
       lastBuiltTime = t
+      lastCommandTime = t
     }
+  }
+
+  var live_game_set_command_index = model.setCommandIndex
+  model.setCommandIndex = function(index) {
+    live_game_set_command_index(index)
+    var t = new Date().getTime()
+    if (model.selectedMobile()) {
+      commandSequence([])
+    } else {
+      if (t - lastCommandTime > 2000) {
+        commandSequence([])
+      }
+      var c = commandSequence()
+      c.unshift(model.cmd())
+      commandSequence(c)
+    }
+    lastCommandTime = t
+  }
+  handlers['action_bar.set_command_index'] = function(params) {
+    model.setCommandIndex(params)
   }
 
   return {
@@ -62,6 +91,10 @@ define([
       {
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
+        trigger: function() {
+          var c = commandSequence()
+          return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
+        },
       },
       {
         id: 'air-fab',

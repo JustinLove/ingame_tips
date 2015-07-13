@@ -55,7 +55,7 @@ define([
       ko.computed(function() {
         if (tip.trigger()) {
           console.log(tip.text)
-          triggeredTip(tip)
+          setTimeout(triggeredTip, 0, tip)
         }
       })
     }
