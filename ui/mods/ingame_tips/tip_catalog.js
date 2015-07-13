@@ -4,6 +4,7 @@ define([
   "use strict";
 
   var singleBuildSequence = ko.observableArray([])
+  var unitBuildSequence = ko.observableArray([])
   var lastBuiltTime = new Date().getTime()
 
   var live_game_build_bar_build = handlers['build_bar.build']
@@ -11,12 +12,23 @@ define([
     live_game_build_bar_build(params)
     if (!model.selectedMobile()) {
       var t = new Date().getTime()
-      if (params.urgent || params.batch) {
+      if (t - lastBuiltTime > 2000) {
         singleBuildSequence([])
-      } else if (t - lastBuiltTime < 2000) {
-        singleBuildSequence.unshift(params)
+        unitBuildSequence([])
+      }
+      if (params.urgent) {
+        singleBuildSequence([])
+        unitBuildSequence.unshift(params)
+      } else if (params.batch) {
+        singleBuildSequence([])
+        var a = unitBuildSequence()
+        for (var i = 0;i < model.batchBuildSize();i++) {
+          a.unshift(params)
+        }
+        unitBuildSequence(a)
       } else {
-        singleBuildSequence([params])
+        singleBuildSequence.unshift(params)
+        unitBuildSequence.unshift(params)
       }
       lastBuiltTime = t
     }
@@ -43,6 +55,9 @@ define([
       {
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
+        trigger: function() {
+          return unitBuildSequence().length >= 20
+        },
       },
       {
         id: 'priority-build',
