@@ -1,63 +1,45 @@
 define([
+  'ingame_tips/sequence',
 ], function(
+  Sequence
 ) {
   "use strict";
 
-  var singleBuildSequence = ko.observableArray([])
-  var unitBuildSequence = ko.observableArray([])
-  var commandSequence = ko.observableArray([])
-  var lastBuiltTime = new Date().getTime()
-  var lastCommandTime = new Date().getTime()
+
+  var singleBuildSequence = new Sequence()
+  var unitBuildSequence = new Sequence()
+  var commandSequence = new Sequence()
 
   var live_game_build_bar_build = handlers['build_bar.build']
   handlers['build_bar.build'] = function(params) {
     live_game_build_bar_build(params)
     if (!model.selectedMobile()) {
-      var t = new Date().getTime()
-      if (t - lastBuiltTime > 2000) {
-        singleBuildSequence([])
-        unitBuildSequence([])
-      }
-      if (t - lastCommandTime > 2000) {
-        commandSequence([])
-      }
-      var c = commandSequence()
-      c.unshift('build')
-      commandSequence(c)
+      commandSequence.unshift('build')
       if (params.urgent) {
-        singleBuildSequence([])
+        singleBuildSequence.reset()
         unitBuildSequence.unshift(params)
       } else if (params.batch) {
-        singleBuildSequence([])
-        var a = unitBuildSequence()
-        for (var i = 0;i < model.batchBuildSize();i++) {
-          a.unshift(params)
-        }
-        unitBuildSequence(a)
+        singleBuildSequence.reset()
+        unitBuildSequence.batch(function(a) {
+          for (var i = 0;i < model.batchBuildSize();i++) {
+            a.unshift(params)
+          }
+        })
       } else {
         singleBuildSequence.unshift(params)
         unitBuildSequence.unshift(params)
       }
-      lastBuiltTime = t
-      lastCommandTime = t
     }
   }
 
   var live_game_set_command_index = model.setCommandIndex
   model.setCommandIndex = function(index) {
     live_game_set_command_index(index)
-    var t = new Date().getTime()
     if (model.selectedMobile()) {
-      commandSequence([])
+      commandSequence.reset()
     } else {
-      if (t - lastCommandTime > 2000) {
-        commandSequence([])
-      }
-      var c = commandSequence()
-      c.unshift(model.cmd())
-      commandSequence(c)
+      commandSequence.unshift(model.cmd())
     }
-    lastCommandTime = t
   }
   handlers['action_bar.set_command_index'] = function(params) {
     model.setCommandIndex(params)
@@ -69,9 +51,9 @@ define([
         id: 'shift-build',
         text: 'Shift-click factory build icons to add five units.',
         trigger: function() {
-          if (singleBuildSequence().length < model.batchBuildSize()) return false
+          if (singleBuildSequence.events().length < model.batchBuildSize()) return false
 
-          var ids = singleBuildSequence.slice(model.batchBuildSize()).map(function(action) {return action.item})
+          var ids = singleBuildSequence.events().slice(model.batchBuildSize()).map(function(action) {return action.item})
           for (var i = 1;i < ids.length;i++) {
             if (ids[i] != ids[0]) {
               return false
@@ -85,14 +67,14 @@ define([
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
         trigger: function() {
-          return unitBuildSequence().length >= 20
+          return unitBuildSequence.events().length >= 20
         },
       },
       {
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
         trigger: function() {
-          var c = commandSequence()
+          var c = commandSequence.events()
           return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
         },
       },
@@ -100,7 +82,7 @@ define([
         id: 'air-fab',
         text: 'Air fabricators are less efficient and easily hit by fighters, but movement speed and mobility can be key advantage, especially when alone.',
         trigger: function() {
-          var build = unitBuildSequence()[0]
+          var build = unitBuildSequence.events()[0]
           return build && build.item.match('fabrication_aircraft')
         },
       },
