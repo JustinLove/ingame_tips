@@ -8,6 +8,8 @@ define([
 
   var singleBuildSequence = new Sequence()
   var unitBuildSequence = new Sequence()
+  var structureBuildSequence = new Sequence()
+  var lastBuildStructureId = ko.observable()
   var commandSequence = new Sequence()
 
   var live_game_build_bar_build = handlers['build_bar.build']
@@ -45,6 +47,23 @@ define([
     model.setCommandIndex(params)
   }
 
+  model.activatedBuildId.subscribe(function(id) {
+    if (id) {
+      lastBuildStructureId(id)
+    }
+  })
+
+  var holodeck_unitEndFab = api.Holodeck.prototype.unitEndFab
+  api.Holodeck.prototype.unitEndFab = function(anchorX, anchorY, queue, snap) {
+    var promise = holodeck_unitEndFab.apply(this, arguments)
+    promise.then(function(success) {
+      if (success) {
+        structureBuildSequence.unshift(model.currentBuildStructureId() || lastBuildStructureId())
+      }
+    })
+    return promise
+  }
+
   return {
     tips: [
       {
@@ -53,7 +72,7 @@ define([
         trigger: function() {
           if (singleBuildSequence.events().length < model.batchBuildSize()) return false
 
-          var ids = singleBuildSequence.events().slice(model.batchBuildSize()).map(function(action) {return action.item})
+          var ids = singleBuildSequence.events().slice(0,model.batchBuildSize()).map(function(action) {return action.item})
           for (var i = 1;i < ids.length;i++) {
             if (ids[i] != ids[0]) {
               return false
@@ -125,6 +144,11 @@ define([
       {
         id: 'area-mex',
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
+        trigger: function() {
+          if (structureBuildSequence.events().length < 5) return false
+
+          return structureBuildSequence.events().slice(0,5).filter(function(id) {return id.match('metal_extractor')}).length == 5
+        },
       },
       {
         id: 'queued-commands',
