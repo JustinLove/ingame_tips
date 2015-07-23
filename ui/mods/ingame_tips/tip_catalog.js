@@ -145,9 +145,14 @@ define([
         id: 'area-mex',
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
         trigger: function() {
-          if (structureBuildSequence.events().length < 5) return false
+          var level = 5
+          if (structureBuildSequence.events().length < level) return false
 
-          return structureBuildSequence.events().slice(0,5).filter(function(id) {return id.match('metal_extractor')}).length == 5
+          var builders = Object.keys(model.selection.peek().spec_ids)
+          var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
+          var mex = structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+
+          return commanders < 1 && mex == level
         },
       },
       {
@@ -161,6 +166,16 @@ define([
       {
         id: 'mex-builders',
         text: 'Fabricators move faster than your commander, prefer them to roam around building metal extractors.',
+        trigger: function() {
+          var level = 2
+          if (structureBuildSequence.events().length < level) return false
+
+          var builders = Object.keys(model.selection.peek().spec_ids)
+          var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
+          var mex = structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+
+          return commanders > 0 && mex == level
+        },
       },
     ],
   }
