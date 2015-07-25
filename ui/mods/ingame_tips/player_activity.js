@@ -5,6 +5,7 @@ define([
 
   var commandRatePromise = $.Deferred()
   var commandRate = commandRatePromise.promise()
+  var unitCount = ko.observable(0)
 
   var endOfTime = ko.observable(0)
   var sample = null
@@ -16,6 +17,7 @@ define([
     var payload = JSON.parse(string)
     previousSample = sample
     sample = payload.armies[model.armyIndex()]
+    unitCount(sample.unit_count)
     if (previousSample && previousSample.unit_count > 0) {
       var commands = sample.commands_given - previousSample.commands_given
       commandRatePromise.notify(60 * commands / pollingPeriod, pollingPeriod)
@@ -41,6 +43,7 @@ define([
 
   return {
     commandRate: commandRate,
+    unitCount: unitCount,
     pollingPeriod: pollingPeriod,
     queryStats: queryStats,
   }

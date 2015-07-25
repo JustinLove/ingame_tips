@@ -1,7 +1,9 @@
 define([
   'ingame_tips/sequence',
+  'ingame_tips/player_activity',
 ], function(
-  Sequence
+  Sequence,
+  player_activity
 ) {
   "use strict";
 
@@ -11,6 +13,7 @@ define([
     structureBuildSequence: new Sequence(),
     commandSequence: new Sequence(),
     usedContinuous: ko.observable(false),
+    unitCount: player_activity.unitCount,
   }
 
   var lastBuildStructureId
