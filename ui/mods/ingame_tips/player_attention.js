@@ -62,10 +62,12 @@ define([
   var triggeredTip = function(tip) {
     var now = new Date().getTime()
     if (tipStats[tip.id] && now < tipStats[tip.id].notUntil) {
-      console.log('discarding recent tip')
+      console.log('discarding recent tip', tip.id)
       triggered = null
       return
     }
+
+    console.log(tip.text)
 
     if (timeSinceLastTip() > minimumTipTime) {
       show(tip)
@@ -73,6 +75,11 @@ define([
     } else {
       triggered = tip
     }
+  }
+
+  var provenTip = function(tip) {
+    console.log('prove', tip.id)
+    bumpStats(tip)
   }
 
   var tick = function(rate, period) {
@@ -91,8 +98,15 @@ define([
     if (tip.trigger) {
       ko.computed(function() {
         if (tip.trigger()) {
-          console.log(tip.text)
           setTimeout(triggeredTip, 0, tip)
+        }
+      })
+    }
+
+    if (tip.proof) {
+      ko.computed(function() {
+        if (tip.proof()) {
+          setTimeout(provenTip, 0, tip)
         }
       })
     }

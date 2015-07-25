@@ -22,12 +22,16 @@ define([
 
           return true
         },
+        proof: function() {
+          if (actions.unitBuildSequence.events().length < 1) return false
+          return actions.unitBuildSequence.events()[0].batch
+        },
       },
       {
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
         trigger: function() {
-          if (actions.unitBuildSequence.events().length < 20/model.batchBuildSize()) return
+          if (actions.unitBuildSequence.events().length < 20/model.batchBuildSize()) return false
           return actions.unitBuildSequence.events().slice(0,20).map(function(event) {
             return event.batch ? model.batchBuildSize() : 1
           }).reduce(function(a, b) {return a + b}) >= 20
