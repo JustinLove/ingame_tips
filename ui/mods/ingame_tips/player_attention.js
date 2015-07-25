@@ -10,7 +10,7 @@ define([
   var lastTime = 0
   var minimumTipTime = 10
   var maximumTipTime = 5 * 60
-  var repeatPeriod = 0.01 * 60 * 60
+  var repeatPeriod = 0.1 * 60 * 60 * 1000
   var longTermMinimum = minimumTipTime
   var tipStats = {}
 
@@ -43,8 +43,13 @@ define([
   }
 
   var genericTip = function() {
-    var i = Math.floor(Math.random() * catalog.tips.length)
-    show(catalog.tips[i])
+    var now = new Date().getTime()
+    var tips = catalog.tips.filter(function(tip) {
+      return !tipStats[tip.id] || tipStats[tip.id].notUntil < now
+    })
+    if (tips.length < 1) return
+    var i = Math.floor(Math.random() * tips.length)
+    show(tips[i])
   }
 
   var triggeredTip = function(tip) {
