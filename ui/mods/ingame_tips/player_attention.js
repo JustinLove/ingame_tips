@@ -60,6 +60,13 @@ define([
   }
 
   var triggeredTip = function(tip) {
+    var now = new Date().getTime()
+    if (tipStats[tip.id] && now < tipStats[tip.id].notUntil) {
+      console.log('discarding recent tip')
+      triggered = null
+      return
+    }
+
     if (timeSinceLastTip() > minimumTipTime) {
       show(tip)
       triggered = null
