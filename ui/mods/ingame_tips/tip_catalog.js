@@ -36,6 +36,9 @@ define([
             return event.batch ? model.batchBuildSize() : 1
           }).reduce(function(a, b) {return a + b}) >= 20
         },
+        proof: function() {
+          return actions.usedContinuous()
+        },
       },
       {
         id: 'priority-build',

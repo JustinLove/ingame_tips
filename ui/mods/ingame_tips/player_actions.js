@@ -10,6 +10,7 @@ define([
     unitBuildSequence: new Sequence(),
     structureBuildSequence: new Sequence(),
     commandSequence: new Sequence(),
+    usedContinuous: ko.observable(false),
   }
 
   var lastBuildStructureId = ko.observable()
@@ -58,6 +59,10 @@ define([
       }
     })
     return promise
+  }
+
+  handlers['ingame_tips_continuous'] = function() {
+    actions.usedContinuous(true)
   }
 
   return actions

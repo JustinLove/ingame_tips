@@ -12,6 +12,9 @@
   "scenes": {
     "live_game": [
       "coui://ui/mods/ingame_tips/live_game_bootstrap.js"
+    ],
+    "live_game_action_bar": [
+      "coui://ui/mods/ingame_tips/live_game_action_bar.js"
     ]
   },
   "signature": "not yet implemented",
