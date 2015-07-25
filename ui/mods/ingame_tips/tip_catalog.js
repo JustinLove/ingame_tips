@@ -44,6 +44,10 @@ define([
           var c = actions.commandSequence.events()
           return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
         },
+        proof: function() {
+          if (actions.unitBuildSequence.events().length < 1) return false
+          return actions.unitBuildSequence.events()[0].urgent
+        },
       },
       {
         id: 'air-fab',
