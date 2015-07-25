@@ -10,7 +10,9 @@ define([
   var lastTime = 0
   var minimumTipTime = 10
   var maximumTipTime = 5 * 60
+  var repeatPeriod = 0.01 * 60 * 60
   var longTermMinimum = minimumTipTime
+  var tipStats = {}
 
   var resetTimer = function() {
     lastTime = new Date().getTime()
@@ -22,16 +24,32 @@ define([
     return (new Date().getTime() - lastTime) / 1000
   }
 
+  var bumpStats = function(tip) {
+    var stats = tipStats[tip.id] || {count: 0, notUntil: lastTime}
+    stats.count = stats.count + 1
+    if (stats.notUntil > lastTime) {
+      stats.notUntil = stats.notUntil + repeatPeriod
+    } else {
+      stats.notUntil = lastTime + repeatPeriod
+    }
+    tipStats[tip.id] = stats
+    console.log(tipStats)
+  }
+
+  var show = function(tip) {
+    present.present(tip.text)
+    resetTimer()
+    bumpStats(tip)
+  }
+
   var genericTip = function() {
     var i = Math.floor(Math.random() * catalog.tips.length)
-    present.present(catalog.tips[i].text)
-    resetTimer()
+    show(catalog.tips[i])
   }
 
   var triggeredTip = function(tip) {
     if (timeSinceLastTip() > minimumTipTime) {
-      present.present(tip.text)
-      resetTimer()
+      show(tip)
       triggered = null
     } else {
       triggered = tip
