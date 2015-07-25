@@ -13,7 +13,9 @@ define([
     usedContinuous: ko.observable(false),
   }
 
-  var lastBuildStructureId = ko.observable()
+  var lastBuildStructureId
+  var beginFabX
+  var beginFabY
 
   var live_game_build_bar_build = handlers['build_bar.build']
   handlers['build_bar.build'] = function(params) {
@@ -46,16 +48,28 @@ define([
 
   model.activatedBuildId.subscribe(function(id) {
     if (id) {
-      lastBuildStructureId(id)
+      lastBuildStructureId = id
     }
   })
+
+  var holodeck_unitBeginFab = api.Holodeck.prototype.unitBeginFab
+  api.Holodeck.prototype.unitBeginFab = function(anchorX, anchorY, snap) {
+    beginFabX = anchorX
+    beginFabY = anchorY
+    return holodeck_unitBeginFab.apply(this, arguments)
+  }
 
   var holodeck_unitEndFab = api.Holodeck.prototype.unitEndFab
   api.Holodeck.prototype.unitEndFab = function(anchorX, anchorY, queue, snap) {
     var promise = holodeck_unitEndFab.apply(this, arguments)
     promise.then(function(success) {
       if (success) {
-        actions.structureBuildSequence.unshift(model.currentBuildStructureId() || lastBuildStructureId())
+        var dx = anchorX - beginFabX
+        var dy = anchorY - beginFabY
+        actions.structureBuildSequence.unshift({
+          item: model.currentBuildStructureId() || lastBuildStructureId,
+          screenDistance: Math.sqrt(dx*dx + dy*dy),
+        })
       }
     })
     return promise

@@ -104,10 +104,15 @@ define([
           if (actions.structureBuildSequence.events().length < level) return false
 
           var builders = Object.keys(model.selection.peek().spec_ids)
-          var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
-          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
+          if (commanders > 0) return
+          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(build) {return build.item.match('metal_extractor')}).length
 
-          return commanders < 1 && mex == level
+          return mex == level
+        },
+        proof: function() {
+          var build = actions.structureBuildSequence.events()[0]
+          return build && build.item.match('metal_extractor') && build.screenDistance > 10
         },
       },
       {
