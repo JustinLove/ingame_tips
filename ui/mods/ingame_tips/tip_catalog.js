@@ -1,68 +1,9 @@
 define([
-  'ingame_tips/sequence',
+  'ingame_tips/player_actions',
 ], function(
-  Sequence
+  actions
 ) {
   "use strict";
-
-
-  var singleBuildSequence = new Sequence()
-  var unitBuildSequence = new Sequence()
-  var structureBuildSequence = new Sequence()
-  var lastBuildStructureId = ko.observable()
-  var commandSequence = new Sequence()
-
-  var live_game_build_bar_build = handlers['build_bar.build']
-  handlers['build_bar.build'] = function(params) {
-    live_game_build_bar_build(params)
-    if (!model.selectedMobile()) {
-      commandSequence.unshift('build')
-      if (params.urgent) {
-        singleBuildSequence.reset()
-        unitBuildSequence.unshift(params)
-      } else if (params.batch) {
-        singleBuildSequence.reset()
-        unitBuildSequence.batch(function(a) {
-          for (var i = 0;i < model.batchBuildSize();i++) {
-            a.unshift(params)
-          }
-        })
-      } else {
-        singleBuildSequence.unshift(params)
-        unitBuildSequence.unshift(params)
-      }
-    }
-  }
-
-  var live_game_set_command_index = model.setCommandIndex
-  model.setCommandIndex = function(index) {
-    live_game_set_command_index(index)
-    if (model.selectedMobile()) {
-      commandSequence.reset()
-    } else {
-      commandSequence.unshift(model.cmd())
-    }
-  }
-  handlers['action_bar.set_command_index'] = function(params) {
-    model.setCommandIndex(params)
-  }
-
-  model.activatedBuildId.subscribe(function(id) {
-    if (id) {
-      lastBuildStructureId(id)
-    }
-  })
-
-  var holodeck_unitEndFab = api.Holodeck.prototype.unitEndFab
-  api.Holodeck.prototype.unitEndFab = function(anchorX, anchorY, queue, snap) {
-    var promise = holodeck_unitEndFab.apply(this, arguments)
-    promise.then(function(success) {
-      if (success) {
-        structureBuildSequence.unshift(model.currentBuildStructureId() || lastBuildStructureId())
-      }
-    })
-    return promise
-  }
 
   return {
     tips: [
@@ -70,9 +11,9 @@ define([
         id: 'shift-build',
         text: 'Shift-click factory build icons to add five units.',
         trigger: function() {
-          if (singleBuildSequence.events().length < model.batchBuildSize()) return false
+          if (actions.singleBuildSequence.events().length < model.batchBuildSize()) return false
 
-          var ids = singleBuildSequence.events().slice(0,model.batchBuildSize()).map(function(action) {return action.item})
+          var ids = actions.singleBuildSequence.events().slice(0,model.batchBuildSize()).map(function(action) {return action.item})
           for (var i = 1;i < ids.length;i++) {
             if (ids[i] != ids[0]) {
               return false
@@ -86,14 +27,14 @@ define([
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
         trigger: function() {
-          return unitBuildSequence.events().length >= 20
+          return actions.unitBuildSequence.events().length >= 20
         },
       },
       {
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
         trigger: function() {
-          var c = commandSequence.events()
+          var c = actions.commandSequence.events()
           return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
         },
       },
@@ -101,7 +42,7 @@ define([
         id: 'air-fab',
         text: 'Air fabricators are less efficient and easily hit by fighters, but movement speed and mobility can be key advantage, especially when alone.',
         trigger: function() {
-          var build = unitBuildSequence.events()[0]
+          var build = actions.unitBuildSequence.events()[0]
           return build && build.item.match('fabrication_aircraft')
         },
       },
@@ -146,11 +87,11 @@ define([
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
         trigger: function() {
           var level = 5
-          if (structureBuildSequence.events().length < level) return false
+          if (actions.structureBuildSequence.events().length < level) return false
 
           var builders = Object.keys(model.selection.peek().spec_ids)
           var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
-          var mex = structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
 
           return commanders < 1 && mex == level
         },
@@ -168,11 +109,11 @@ define([
         text: 'Fabricators move faster than your commander, prefer them to roam around building metal extractors.',
         trigger: function() {
           var level = 2
-          if (structureBuildSequence.events().length < level) return false
+          if (actions.structureBuildSequence.events().length < level) return false
 
           var builders = Object.keys(model.selection.peek().spec_ids)
           var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
-          var mex = structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
 
           return commanders > 0 && mex == level
         },
