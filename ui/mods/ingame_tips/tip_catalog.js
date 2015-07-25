@@ -27,7 +27,10 @@ define([
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
         trigger: function() {
-          return actions.unitBuildSequence.events().length >= 20
+          if (actions.unitBuildSequence.events().length < 20/model.batchBuildSize()) return
+          return actions.unitBuildSequence.events().slice(0,20).map(function(event) {
+            return event.batch ? model.batchBuildSize() : 1
+          }).reduce(function(a, b) {return a + b}) >= 20
         },
       },
       {

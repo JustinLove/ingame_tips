@@ -19,19 +19,13 @@ define([
     live_game_build_bar_build(params)
     if (!model.selectedMobile()) {
       actions.commandSequence.unshift('build')
+      actions.unitBuildSequence.unshift(params)
       if (params.urgent) {
         actions.singleBuildSequence.reset()
-        actions.unitBuildSequence.unshift(params)
       } else if (params.batch) {
         actions.singleBuildSequence.reset()
-        actions.unitBuildSequence.batch(function(a) {
-          for (var i = 0;i < model.batchBuildSize();i++) {
-            a.unshift(params)
-          }
-        })
       } else {
         actions.singleBuildSequence.unshift(params)
-        actions.unitBuildSequence.unshift(params)
       }
     }
   }
