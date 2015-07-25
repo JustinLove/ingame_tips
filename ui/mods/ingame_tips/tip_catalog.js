@@ -123,10 +123,22 @@ define([
           if (actions.structureBuildSequence.events().length < level) return false
 
           var builders = Object.keys(model.selection.peek().spec_ids)
-          var commanders = builders.filter(function(id) {return id.match('commanders')}).length > 0
+          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
+          if (commanders < 1) return false
           var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
 
           return commanders > 0 && mex == level
+        },
+        proof: function() {
+          var level = 2
+          if (actions.structureBuildSequence.events().length < level) return false
+
+          var builders = Object.keys(model.selection.peek().spec_ids)
+          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
+          if (commanders > 0) return false
+          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+
+          return commanders < 1 && mex == level
         },
       },
     ],
