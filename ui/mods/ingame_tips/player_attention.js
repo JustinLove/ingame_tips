@@ -28,12 +28,13 @@ define([
   }
 
   var bumpStats = function(tip) {
-    var stats = tipStats[tip.id] || {count: 0, notUntil: lastTime}
+    var stats = tipStats[tip.id] || {count: 0, lastShown: lastTime, period: 0}
     stats.count = stats.count + 1
-    if (stats.notUntil > lastTime) {
-      stats.notUntil = stats.notUntil + repeatPeriod
+    if (stats.lastShown + stats.period > lastTime) {
+      stats.period = stats.period + repeatPeriod
     } else {
-      stats.notUntil = lastTime + repeatPeriod
+      stats.lastShown = lastTime
+      stats.period = repeatPeriod
     }
     tipStats[tip.id] = stats
     storage(tipStats)
@@ -48,7 +49,7 @@ define([
   var genericTip = function() {
     var now = new Date().getTime()
     var tips = catalog.tips.filter(function(tip) {
-      return !tipStats[tip.id] || tipStats[tip.id].notUntil < now
+      return !tipStats[tip.id] || tipStats[tip.id].lastShown + tipStats[tip.id].period < now
     })
     var counts = tips.map(function(tip) {
       return (tipStats[tip.id] && tipStats[tip.id].count) || 0
@@ -64,7 +65,7 @@ define([
 
   var triggeredTip = function(tip) {
     var now = new Date().getTime()
-    if (tipStats[tip.id] && now < tipStats[tip.id].notUntil) {
+    if (tipStats[tip.id] && now < tipStats[tip.id].lastShown + tipStats[tip.id].period) {
       console.log('discarding recent tip', tip.id)
       triggered = null
       return
