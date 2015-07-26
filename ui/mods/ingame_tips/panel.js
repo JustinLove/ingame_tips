@@ -7,6 +7,7 @@ define(function() {
       left: 0,
     }).attr({
       src: "coui://ui/mods/ingame_tips/ingame_tips.html",
+      'no-input': true,
       'no-keyboard': true,
       'yield-focus': true,
       fit: "dock-top-left",
