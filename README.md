@@ -4,8 +4,9 @@ Tips and tricks to play the game, in context where possible.
 
 ## Features
 
-- Advanced anti-nag technology avoids repeating tips too often.
+- "Triggers" show tips when something relevant has happened.
 - "Proofs" silence tips you obvoiusly know already.
+- Advanced anti-nag technology avoids repeating tips too often.
 - APM tracking tries to keep generic tips away from battles.
 
 This mod is primarily beginner focused; experienced players will likely hit most of the proofs and few of the triggers, and may never see a contextual tip.
