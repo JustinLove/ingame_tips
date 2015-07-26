@@ -15,6 +15,9 @@
     ],
     "live_game_action_bar": [
       "coui://ui/mods/ingame_tips/live_game_action_bar.js"
+    ],
+    "settings": [
+      "coui://ui/mods/ingame_tips/settings.js"
     ]
   },
   "signature": "not yet implemented",
