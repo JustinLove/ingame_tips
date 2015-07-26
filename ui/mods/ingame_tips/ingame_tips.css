@@ -20,9 +20,10 @@ body-dock {
 }
 
 .ingame_tips_cont {
-  border-image:url(coui://ui/main/shared/img/panel/img_menu_panel.png) 14 22 22 22;
-  border-width:14px 22px 22px 22px;
-  box-shadow: inset 1000px 1000px 1000px 1000px #000;
+  background: rgba(0,0,0,0.5);
+  border: solid rgba(50, 96, 133, 1) 1px;
+  box-shadow: 0 0 10px rgba(40, 96, 133, 1);
+  padding: 14px 22px 22px 22px;
   margin: 8px 8px 0px 8px;
   position: relative;
 }
