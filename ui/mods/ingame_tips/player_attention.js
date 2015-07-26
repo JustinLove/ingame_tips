@@ -8,14 +8,14 @@ define([
   "use strict";
 
   var lastTime = 0
-  var minimumTipTime = 10
-  var maximumTipTime = 0.5 * 60
-  var repeatPeriod = 0.01 * 60 * 60 * 1000
+  var minimumTipTime = 60
+  var maximumTipTime = 5 * 60
+  var repeatPeriod = 12 * 60 * 60 * 1000
   var longTermMinimum = minimumTipTime
   var storage = ko.observable({}).extend({ local: 'ingame_tips' })
   //storage({})
   var tipStats = storage()
-  console.log(tipStats)
+  //console.log(tipStats)
 
   var resetTimer = function() {
     lastTime = new Date().getTime()
@@ -54,7 +54,7 @@ define([
     var counts = tips.map(function(tip) {
       return (tipStats[tip.id] && tipStats[tip.id].count) || 0
     })
-    var min = Math.min(counts)
+    var min = Math.min.apply(Math, counts)
     var tips = tips.filter(function(tip) {
       return !tipStats[tip.id] || tipStats[tip.id].count == min
     })
@@ -64,11 +64,14 @@ define([
   }
 
   var triggeredTip = function(tip) {
-    var now = new Date().getTime()
-    if (tipStats[tip.id] && now < tipStats[tip.id].lastShown + tipStats[tip.id].period) {
-      console.log('discarding recent tip', tip.id)
-      triggered = null
-      return
+    if (tipStats[tip.id]) {
+      var now = new Date().getTime()
+      var dt = tipStats[tip.id].lastShown + tipStats[tip.id].period - now
+      if (dt > 0) {
+        console.log('discarding recent tip', tip.id, dt / (60*60*1000))
+        triggered = null
+        return
+      }
     }
 
     console.log(tip.text)
