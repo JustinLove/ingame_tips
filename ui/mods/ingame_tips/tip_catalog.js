@@ -54,7 +54,7 @@ define([
       },
       {
         id: 'air-fab',
-        text: 'Air fabricators are less efficient and easily hit by fighters, but movement speed and mobility can be key advantage, especially when alone.',
+        text: 'Air fabricators are less efficient and easily hit by fighters, but movement speed and mobility can be key advantage, especially when alone on a planet.',
         trigger: function() {
           var build = actions.unitBuildSequence.events()[0]
           return build && build.item.match('fabrication_aircraft') && actions.unitCount.peek() < 10
