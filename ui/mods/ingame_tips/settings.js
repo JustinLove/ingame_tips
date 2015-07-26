@@ -5,39 +5,59 @@
     storage({})
   }
 
+  var log = function(v) {
+    return Math.log(v)/Math.LN10
+  }
+  var exp = function(v) {
+    return Math.round(Math.pow(10, v))
+  }
+
+  var formatPeriod = function(p) {
+    var p = exp(p)
+    if (p < 2*60) {
+      return p + ' seconds'
+    } else if (p < 2*60*60) {
+      return (p/60).toPrecision(3) + ' minutes'
+    } else if (p < 2*24*60*60) {
+      return (p/(60*60)).toPrecision(2) + ' hours'
+    } else {
+      return (p/(24*60*60)).toPrecision(2) + ' days'
+    }
+  }
+
   var ingame_tips_settings = {
-    ingame_tips_minimum_minutes_between_tips: {
-      title: 'Minimum Minutes Between Tips',
+    ingame_tips_minimum_time_between_tips: {
+      title: 'Minimum Time Between Tips',
       type: 'slider',
       options: {
-        formater: function(v) {return v.toPrecision(2)},
+        formater: formatPeriod,
         min: 0,
-        max: 10,
-        step: 0.1,
+        max: log(60*60),
+        step: 0.01,
       },
-      default: 1,
+      default: log(60),
     },
-    ingame_tips_minutes_until_generic_tip: {
-      title: 'Minutes Until Generic Tip',
+    ingame_tips_time_until_generic_tip: {
+      title: 'Time Until Generic Tip',
       type: 'slider',
       options: {
-        formater: function(v) {return v.toPrecision(2)},
+        formater: formatPeriod,
         min: 0,
-        max: 30,
-        step: 0.1,
+        max: log(60*60),
+        step: 0.01,
       },
-      default: 5,
+      default: log(5*60),
     },
-    ingame_tips_minimum_hours_between_repeats: {
-      title: 'Minimum Hours Between Repeats',
+    ingame_tips_minimum_time_between_repeats: {
+      title: 'Minimum Time Between Repeats',
       type: 'slider',
       options: {
-        formater: function(v) {return v.toPrecision(2)},
+        formater: formatPeriod,
         min: 0,
-        max: 24,
-        step: 0.1,
+        max: log(7*24*60*60),
+        step: 0.01,
       },
-      default: 12,
+      default: log(12*60*60),
     },
   }
 

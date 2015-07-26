@@ -7,27 +7,26 @@ define([
 ) {
   "use strict";
 
-  var lastTime = 0
-
-  var minimumTipTime = api.settings.isSet('ui', 'ingame_tips_minimum_minutes_between_tips', true)
-  if (typeof(minimumTipTime) != 'number') {
-    minimumTipTime = 1
+  var exp = function(v, def) {
+    if (typeof(v) == 'number') {
+      return Math.round(Math.pow(10, v))
+    } else {
+      return def
+    }
   }
-  minimumTipTime = minimumTipTime * 60
 
-  var maximumTipTime = api.settings.isSet('ui', 'ingame_tips_minutes_until_generic_tip', true)
-  if (typeof(maximumTipTime) != 'number') {
-    maximumTipTime = 5
-  }
-  maximumTipTime = maximumTipTime * 60
+  var minimumTipTime = api.settings.isSet('ui', 'ingame_tips_minimum_time_between_tips', true)
+  minimumTipTime = exp(minimumTipTime, 1*60)
 
-  var repeatPeriod = api.settings.isSet('ui', 'ingame_tips_minimum_hours_between_repeats', true)
-  if (typeof(repeatPeriod) != 'number') {
-    repeatPeriod = 12
-  }
-  repeatPeriod = repeatPeriod * 60 * 60 * 1000
+  var maximumTipTime = api.settings.isSet('ui', 'ingame_tips_time_until_generic_tip', true)
+  maximumTipTime = exp(maximumTipTime, 5*60)
+
+  var repeatPeriod = api.settings.isSet('ui', 'ingame_tips_minimum_time_between_repeats', true)
+  repeatPeriod = exp(repeatPeriod, 12*60*60) * 1000
 
   console.log(minimumTipTime, maximumTipTime, repeatPeriod)
+
+  var lastTime = 0
   var longTermMinimum = minimumTipTime
   var storage = ko.observable({}).extend({ local: 'ingame_tips' })
   //storage({})
