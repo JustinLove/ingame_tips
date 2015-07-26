@@ -12,7 +12,10 @@ define([
   var maximumTipTime = 0.5 * 60
   var repeatPeriod = 0.01 * 60 * 60 * 1000
   var longTermMinimum = minimumTipTime
-  var tipStats = {}
+  var storage = ko.observable({}).extend({ local: 'ingame_tips' })
+  //storage({})
+  var tipStats = storage()
+  console.log(tipStats)
 
   var resetTimer = function() {
     lastTime = new Date().getTime()
@@ -33,7 +36,7 @@ define([
       stats.notUntil = lastTime + repeatPeriod
     }
     tipStats[tip.id] = stats
-    console.log(tipStats)
+    storage(tipStats)
   }
 
   var show = function(tip) {
