@@ -10,6 +10,8 @@ define([
     return event.batch ? model.batchBuildSize() : 1
   }
   var sum = function(a,b) {return a + b}
+  var isCommander = function(id) {return id.match('commanders')}
+  var isBuildMex = function(build) {return build.item.match('metal_extractor')}
   var allTheSame = function(ids) {
     for (var i = 1;i < ids.length;i++) {
       if (ids[i] != ids[0]) {
@@ -32,6 +34,13 @@ define([
       if (subject[i] != mustMatch[i]) return false
     }
     return true
+  }
+  var peekCommanderSelected = function() {
+    var selection = model.selection.peek()
+    if (!selection) return false
+    var builders = Object.keys(selection.spec_ids)
+    var commanders = builders.filter(isCommander).length
+    return commanders > 0
   }
 
   return {
@@ -133,12 +142,11 @@ define([
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
         trigger: function() {
           var level = 5
-          if (actions.structureBuildSequence.events().length < level) return false
+          var events = actions.structureBuildSequence.events()
+          if (events.length < level) return false
+          if (peekCommanderSelected()) return false
 
-          var builders = Object.keys(model.selection.peek().spec_ids)
-          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
-          if (commanders > 0) return
-          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(build) {return build.item.match('metal_extractor')}).length
+          var mex = events.slice(0,level).filter(isBuildMex).length
 
           return mex == level
         },
@@ -162,25 +170,23 @@ define([
         text: 'Fabricators move faster than your commander, prefer them to roam around building metal extractors.',
         trigger: function() {
           var level = 2
-          if (actions.structureBuildSequence.events().length < level) return false
+          var events = actions.structureBuildSequence.events()
+          if (events.length < level) return false
+          if (!peekCommanderSelected()) return false
 
-          var builders = Object.keys(model.selection.peek().spec_ids)
-          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
-          if (commanders < 1) return false
-          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+          var mex = events.slice(0,level).filter(isBuildMex).length
 
-          return commanders > 0 && mex == level
+          return mex == level
         },
         proof: function() {
           var level = 2
-          if (actions.structureBuildSequence.events().length < level) return false
+          var events = actions.structureBuildSequence.events()
+          if (events.length < level) return false
+          if (peekCommanderSelected()) return false
 
-          var builders = Object.keys(model.selection.peek().spec_ids)
-          var commanders = builders.filter(function(id) {return id.match('commanders')}).length
-          if (commanders > 0) return false
-          var mex = actions.structureBuildSequence.events().slice(0,level).filter(function(id) {return id.match('metal_extractor')}).length
+          var mex = events.slice(0,level).filter(isBuildMex).length
 
-          return commanders < 1 && mex == level
+          return mex == level
         },
       },
     ],
