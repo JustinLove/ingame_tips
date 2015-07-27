@@ -5,6 +5,7 @@ define([
 ) {
   "use strict";
 
+  var metal_extractor = '/pa/units/land/metal_extractor/metal_extractor.json'
   var item = function(action) {return action.item}
   var quantity = function(event) {
     return event.batch ? model.batchBuildSize() : 1
@@ -12,19 +13,23 @@ define([
   var sum = function(a,b) {return a + b}
   var isCommander = function(id) {return id.match('commanders')}
   var isBuildMex = function(build) {return build.item.match('metal_extractor')}
-  var allTheSame = function(ids) {
-    for (var i = 1;i < ids.length;i++) {
-      if (ids[i] != ids[0]) {
+  var allEqual = function(id, ids) {
+    for (var i = 0;i < ids.length;i++) {
+      if (ids[i] != id) {
         return false
       }
     }
     return true
   }
-  var nTheSame = function(n, events) {
+  var nItemEqual = function(n, events, target) {
     if (events.length < n) return false
 
     var ids = events.slice(0, n).map(item)
-    return allTheSame(ids)
+    return allEqual(target, ids)
+  }
+  var nTheSame = function(n, events) {
+    if (events.length < n) return false
+    return nItemEqual(n, events, events[0].item)
   }
   var unitBuildQuantity = function(events) {
     return events.map(quantity).reduce(sum)
@@ -141,19 +146,15 @@ define([
         id: 'area-mex',
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
         trigger: function() {
-          var level = 5
-          var events = actions.structureBuildSequence.events()
-          if (events.length < level) return false
-          if (peekCommanderSelected()) return false
-
-          var mex = events.slice(0,level).filter(isBuildMex).length
-
-          return mex == level
+          return nItemEqual(5,
+              actions.structureBuildSequence.events(),
+              metal_extractor) &&
+            !peekCommanderSelected()
         },
         proof: function() {
           var build = actions.structureBuildSequence.events()[0]
           return build &&
-            build.item.match('metal_extractor') &&
+            build.item == metal_extractor &&
             build.screenDistance > 10
         },
       },
@@ -169,24 +170,16 @@ define([
         id: 'mex-builders',
         text: 'Fabricators move faster than your commander, prefer them to roam around building metal extractors.',
         trigger: function() {
-          var level = 2
-          var events = actions.structureBuildSequence.events()
-          if (events.length < level) return false
-          if (!peekCommanderSelected()) return false
-
-          var mex = events.slice(0,level).filter(isBuildMex).length
-
-          return mex == level
+          return nItemEqual(2,
+              actions.structureBuildSequence.events(),
+              metal_extractor) &&
+            peekCommanderSelected()
         },
         proof: function() {
-          var level = 2
-          var events = actions.structureBuildSequence.events()
-          if (events.length < level) return false
-          if (peekCommanderSelected()) return false
-
-          var mex = events.slice(0,level).filter(isBuildMex).length
-
-          return mex == level
+          return nItemEqual(2,
+              actions.structureBuildSequence.events(),
+              metal_extractor) &&
+            !peekCommanderSelected()
         },
       },
     ],
