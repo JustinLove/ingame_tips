@@ -1,52 +1,13 @@
 define([
   'ingame_tips/player_actions',
+  'ingame_tips/triggers',
 ], function(
-  actions
+  actions,
+  trig
 ) {
   "use strict";
 
   var metal_extractor = '/pa/units/land/metal_extractor/metal_extractor.json'
-  var item = function(action) {return action.item}
-  var quantity = function(event) {
-    return event.batch ? model.batchBuildSize() : 1
-  }
-  var sum = function(a,b) {return a + b}
-  var isCommander = function(id) {return id.match('commanders')}
-  var isBuildMex = function(build) {return build.item.match('metal_extractor')}
-  var allEqual = function(id, ids) {
-    for (var i = 0;i < ids.length;i++) {
-      if (ids[i] != id) {
-        return false
-      }
-    }
-    return true
-  }
-  var nItemEqual = function(n, events, target) {
-    if (events.length < n) return false
-
-    var ids = events.slice(0, n).map(item)
-    return allEqual(target, ids)
-  }
-  var nTheSame = function(n, events) {
-    if (events.length < n) return false
-    return nItemEqual(n, events, events[0].item)
-  }
-  var unitBuildQuantity = function(events) {
-    return events.map(quantity).reduce(sum)
-  }
-  var arrayMatch = function(subject, mustMatch) {
-    for (var i = 0;i <= mustMatch.length;i++) {
-      if (subject[i] != mustMatch[i]) return false
-    }
-    return true
-  }
-  var peekCommanderSelected = function() {
-    var selection = model.selection.peek()
-    if (!selection) return false
-    var builders = Object.keys(selection.spec_ids)
-    var commanders = builders.filter(isCommander).length
-    return commanders > 0
-  }
 
   return {
     tips: [
@@ -54,8 +15,8 @@ define([
         id: 'shift-build',
         text: 'Shift-click factory build icons to add five units.',
         trigger: function() {
-          return nTheSame(model.batchBuildSize(),
-                          actions.singleBuildSequence.events())
+          return trig.nTheSame(model.batchBuildSize(),
+                               actions.singleBuildSequence.events())
         },
         proof: function() {
           var action = actions.unitBuildSequence.events()[0]
@@ -70,7 +31,7 @@ define([
           if (events.length < 20/model.batchBuildSize()) return false
           if (events.length >= 20) return true
 
-          return unitBuildQuantity(events) >= 20
+          return trig.unitBuildQuantity(events) >= 20
         },
         proof: function() {
           return actions.usedContinuous()
@@ -80,9 +41,9 @@ define([
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
         trigger: function() {
-          return arrayMatch(actions.commandSequence.events(),
-                            ['build', 'build', 'stop'])
-                            //note: reversed because lifo
+          return trig.arrayMatch(actions.commandSequence.events(),
+                                 ['build', 'build', 'stop'])
+                                 //note: reversed because lifo
         },
         proof: function() {
           var action = actions.unitBuildSequence.events()[0]
@@ -146,10 +107,10 @@ define([
         id: 'area-mex',
         text: 'Metal extractors can be built with area commands. Click and drag to build all spots in the area.',
         trigger: function() {
-          return nItemEqual(5,
+          return trig.nItemEqual(5,
               actions.structureBuildSequence.events(),
               metal_extractor) &&
-            !peekCommanderSelected()
+            !trig.peekCommanderSelected()
         },
         proof: function() {
           var build = actions.structureBuildSequence.events()[0]
@@ -170,16 +131,16 @@ define([
         id: 'mex-builders',
         text: 'Fabricators move faster than your commander, prefer them to roam around building metal extractors.',
         trigger: function() {
-          return nItemEqual(2,
+          return trig.nItemEqual(2,
               actions.structureBuildSequence.events(),
               metal_extractor) &&
-            peekCommanderSelected()
+            trig.peekCommanderSelected()
         },
         proof: function() {
-          return nItemEqual(2,
+          return trig.nItemEqual(2,
               actions.structureBuildSequence.events(),
               metal_extractor) &&
-            !peekCommanderSelected()
+            !trig.peekCommanderSelected()
         },
       },
     ],
