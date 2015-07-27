@@ -5,36 +5,52 @@ define([
 ) {
   "use strict";
 
+  var item = function(action) {return action.item}
+  var quantity = function(event) {
+    return event.batch ? model.batchBuildSize() : 1
+  }
+  var sum = function(a,b) {return a + b}
+  var allTheSame = function(ids) {
+    for (var i = 1;i < ids.length;i++) {
+      if (ids[i] != ids[0]) {
+        return false
+      }
+    }
+    return true
+  }
+  var nTheSame = function(n, events) {
+    if (events.length < n) return false
+
+    var ids = events.slice(0, n).map(item)
+    return allTheSame(ids)
+  }
+  var unitBuildQuantity = function(events) {
+    return events.map(quantity).reduce(sum)
+  }
+
   return {
     tips: [
       {
         id: 'shift-build',
         text: 'Shift-click factory build icons to add five units.',
         trigger: function() {
-          if (actions.singleBuildSequence.events().length < model.batchBuildSize()) return false
-
-          var ids = actions.singleBuildSequence.events().slice(0,model.batchBuildSize()).map(function(action) {return action.item})
-          for (var i = 1;i < ids.length;i++) {
-            if (ids[i] != ids[0]) {
-              return false
-            }
-          }
-
-          return true
+          return nTheSame(model.batchBuildSize(),
+                          actions.singleBuildSequence.events())
         },
         proof: function() {
-          if (actions.unitBuildSequence.events().length < 1) return false
-          return actions.unitBuildSequence.events()[0].batch
+          var action = actions.unitBuildSequence.events()[0]
+          return action && action.batch
         },
       },
       {
         id: 'continuous-build',
         text: 'You can set factories to continous build to save constantly requeuing units.',
         trigger: function() {
-          if (actions.unitBuildSequence.events().length < 20/model.batchBuildSize()) return false
-          return actions.unitBuildSequence.events().slice(0,20).map(function(event) {
-            return event.batch ? model.batchBuildSize() : 1
-          }).reduce(function(a, b) {return a + b}) >= 20
+          var events = actions.unitBuildSequence.events()
+          if (events.length < 20/model.batchBuildSize()) return false
+          if (events.length >= 20) return true
+
+          return unitBuildQuantity(events) >= 20
         },
         proof: function() {
           return actions.usedContinuous()
@@ -48,8 +64,8 @@ define([
           return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
         },
         proof: function() {
-          if (actions.unitBuildSequence.events().length < 1) return false
-          return actions.unitBuildSequence.events()[0].urgent
+          var action = actions.unitBuildSequence.events()[0]
+          return action && action.urgent
         },
       },
       {
