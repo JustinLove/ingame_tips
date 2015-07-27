@@ -14,6 +14,7 @@ define([
     commandSequence: new Sequence(),
     usedContinuous: ko.observable(false),
     unitCount: player_activity.unitCount,
+    endOfTime: player_activity.endOfTime,
   }
 
   var lastBuildStructureId

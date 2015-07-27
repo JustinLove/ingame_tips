@@ -44,6 +44,7 @@ define([
   return {
     commandRate: commandRate,
     unitCount: unitCount,
+    endOfTime: endOfTime,
     pollingPeriod: pollingPeriod,
     queryStats: queryStats,
   }

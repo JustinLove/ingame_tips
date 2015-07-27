@@ -8,10 +8,10 @@ define([
   "use strict";
 
   var metal_extractor = '/pa/units/land/metal_extractor/metal_extractor.json'
-  var fabrication_aircraft = "/pa/units/air/fabrication_aircraft/fabrication_aircraft.json", 
-  var fabrication_aircraft_adv = "/pa/units/air/fabrication_aircraft_adv/fabrication_aircraft_adv.json", 
+  var fabrication_aircraft = "/pa/units/air/fabrication_aircraft/fabrication_aircraft.json"
+  var fabrication_aircraft_adv = "/pa/units/air/fabrication_aircraft_adv/fabrication_aircraft_adv.json"
   var rFabrication = new RegExp('fabrication')
-  
+  var deep_space_radar = "/pa/units/orbital/deep_space_radar/deep_space_radar.json"
 
   return {
     tips: [
@@ -132,6 +132,13 @@ define([
       {
         id: 'orbital-radar',
         text: 'You need an Oribital and Deep Space Radar to see orbital units, unless you have an oribital unit or ground radar nearby.',
+        trigger: function() {
+          return actions.endOfTime() > 20*60 && actions.endOfTime() < 21*60
+        },
+        proof: function() {
+          var build = actions.structureBuildSequence.events()[0]
+          return build && build.item == deep_space_radar
+        },
       },
       {
         id: 'mex-builders',
