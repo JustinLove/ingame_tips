@@ -55,6 +55,12 @@ define([
     }
   })
 
+  model.currentBuildStructureId.subscribe(function(id) {
+    if (id) {
+      lastBuildStructureId = id
+    }
+  })
+
   var holodeck_unitBeginFab = api.Holodeck.prototype.unitBeginFab
   api.Holodeck.prototype.unitBeginFab = function(anchorX, anchorY, snap) {
     beginFabX = anchorX
@@ -70,7 +76,7 @@ define([
         var dx = anchorX - beginFabX
         var dy = anchorY - beginFabY
         actions.structureBuildSequence.unshift({
-          item: model.currentBuildStructureId() || lastBuildStructureId,
+          item: lastBuildStructureId,
           screenDistance: Math.sqrt(dx*dx + dy*dy),
         })
       }
