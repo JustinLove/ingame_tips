@@ -3,7 +3,7 @@
   "build": "83796",
   "category": ["in-game", "ui"],
   "context": "client",
-  "date": "2015/07/26",
+  "date": "2015/07/27",
   "description": "[WIP] Tips and tricks to play the game, in context where possible.",
   "display_name": "Ingame Tips",
   "forum": "https://forums.uberent.com/threads/rel-ingame-tips.69332/",
@@ -21,6 +21,6 @@
     ]
   },
   "signature": "not yet implemented",
-  "version": "0.1.1"
+  "version": "0.2.0"
 }
 
