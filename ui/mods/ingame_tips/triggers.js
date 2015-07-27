@@ -8,7 +8,8 @@ define([
     return event.batch ? model.batchBuildSize() : 1
   }
   var sum = function(a,b) {return a + b}
-  var isCommander = function(id) {return id.match('commanders')}
+  var rCommander = new RegExp('commanders')
+  var isCommander = function(id) {return rCommander.test('id')}
   var allEqual = function(id, ids) {
     for (var i = 0;i < ids.length;i++) {
       if (ids[i] != id) {

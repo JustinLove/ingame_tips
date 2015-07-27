@@ -8,6 +8,10 @@ define([
   "use strict";
 
   var metal_extractor = '/pa/units/land/metal_extractor/metal_extractor.json'
+  var fabrication_aircraft = "/pa/units/air/fabrication_aircraft/fabrication_aircraft.json", 
+  var fabrication_aircraft_adv = "/pa/units/air/fabrication_aircraft_adv/fabrication_aircraft_adv.json", 
+  var rFabrication = new RegExp('fabrication')
+  
 
   return {
     tips: [
@@ -57,14 +61,16 @@ define([
           var build = actions.unitBuildSequence.events()[0]
           return build &&
             actions.unitCount.peek() < 10 &&
-            build.item.match('fabrication_aircraft')
+            (build.item == fabrication_aircraft ||
+             build.item == fabrication_aircraft_adv)
         },
         proof: function() {
           var build = actions.unitBuildSequence.events()[0]
           return build &&
             actions.unitCount.peek() < 10 &&
-            build.item.match('fabrication') &&
-            !build.item.match('aircraft')
+            build.item != fabrication_aircraft &&
+            build.item != fabrication_aircraft_adv &&
+            rFabrication.test(build.item)
         },
       },
       {
