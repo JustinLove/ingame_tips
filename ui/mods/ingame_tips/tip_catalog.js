@@ -27,6 +27,12 @@ define([
   var unitBuildQuantity = function(events) {
     return events.map(quantity).reduce(sum)
   }
+  var arrayMatch = function(subject, mustMatch) {
+    for (var i = 0;i <= mustMatch.length;i++) {
+      if (subject[i] != mustMatch[i]) return false
+    }
+    return true
+  }
 
   return {
     tips: [
@@ -60,8 +66,9 @@ define([
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
         trigger: function() {
-          var c = actions.commandSequence.events()
-          return c[0] == 'build' && c[1] == 'build' && c[2] == 'stop'
+          return arrayMatch(actions.commandSequence.events(),
+                            ['build', 'build', 'stop'])
+                            //note: reversed because lifo
         },
         proof: function() {
           var action = actions.unitBuildSequence.events()[0]
@@ -73,12 +80,16 @@ define([
         text: 'Air fabricators are less efficient and easily hit by fighters, but movement speed and mobility can be key advantage, especially when alone on a planet.',
         trigger: function() {
           var build = actions.unitBuildSequence.events()[0]
-          return build && build.item.match('fabrication_aircraft') && actions.unitCount.peek() < 10
+          return build &&
+            actions.unitCount.peek() < 10 &&
+            build.item.match('fabrication_aircraft')
         },
         proof: function() {
-          console.log(actions.unitCount.peek())
           var build = actions.unitBuildSequence.events()[0]
-          return build && build.item.match('fabrication') && !build.item.match('aircraft') && actions.unitCount.peek() < 10
+          return build &&
+            actions.unitCount.peek() < 10 &&
+            build.item.match('fabrication') &&
+            !build.item.match('aircraft')
         },
       },
       {
@@ -133,7 +144,9 @@ define([
         },
         proof: function() {
           var build = actions.structureBuildSequence.events()[0]
-          return build && build.item.match('metal_extractor') && build.screenDistance > 10
+          return build &&
+            build.item.match('metal_extractor') &&
+            build.screenDistance > 10
         },
       },
       {
