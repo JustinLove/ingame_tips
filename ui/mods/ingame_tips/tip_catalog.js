@@ -128,6 +128,14 @@ define([
       {
         id: 'queued-commands',
         text: 'Hold shift while issuing orders to queue them up.',
+        trigger: function() {
+          var events = actions.structureBuildSequence.events()
+          return events.length > 1 && !events[0].queue
+        },
+        proof: function() {
+          var events = actions.structureBuildSequence.events()
+          return events.length > 1 && events[0].queue
+        },
       },
       {
         id: 'orbital-radar',

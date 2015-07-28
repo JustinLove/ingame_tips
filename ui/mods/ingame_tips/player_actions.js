@@ -79,6 +79,7 @@ define([
         actions.structureBuildSequence.unshift({
           item: lastBuildStructureId,
           screenDistance: Math.sqrt(dx*dx + dy*dy),
+          queue: queue,
         })
       }
     })
