@@ -112,6 +112,14 @@ define([
       {
         id: 'area-commands',
         text: 'Many commands can be applied to an area by click and drag. Drag past the horizon to apply to the entire planet.',
+        proof: function() {
+          var command = actions.unitCommandSequence.events()[0]
+          if (!command) return false
+          if (command.screenDistance < 20) return false
+          return command.command == 'attack' ||
+                 command.command == 'patrol' ||
+                 command.command == 'reclaim'
+        },
       },
       {
         id: 'area-mex',
