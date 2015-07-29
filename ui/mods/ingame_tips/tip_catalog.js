@@ -45,7 +45,7 @@ define([
         id: 'priority-build',
         text: 'ctrl-clicking a factory build icon adds a unit to the front of the build queue.  If the factory is continuous, priority units will not be repeated.',
         trigger: function() {
-          return trig.arrayMatch(actions.commandSequence.events(),
+          return trig.arrayMatch(actions.factoryCommandSequence.events(),
                                  ['build', 'build', 'stop'])
                                  //note: reversed because lifo
         },
@@ -92,6 +92,10 @@ define([
       {
         id: 'teleporter-linking',
         text: 'To link teleporters, select one and right click the other.',
+        proof: function() {
+          var command = actions.unitCommandSequence.events()[0]
+          return command && command.command == 'link_teleporters'
+        },
       },
       {
         id: 'teleporter-sharing',
