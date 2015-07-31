@@ -176,6 +176,30 @@ define([
             !trig.peekCommanderSelected()
         },
       },
+      {
+        id: 'factory-first',
+        text: 'Start by having your commander build a factory, then a small number of fabricators.',
+      },
+      {
+        id: 'metal-deposits',
+        text: 'Green dots are metal depsosits.  Use a fabricator to build metal extractors on them.',
+      },
+      {
+        id: 'energy',
+        text: 'Factories and fabricators (and radar) use energy.  Build energy plants to keep your supply positive.',
+      },
+      {
+        id: 'rotate-camera',
+        text: 'ctrl left/right rotates the camera.',
+      },
+      {
+        id: 'orient-pole',
+        text: 'You can realign to the pole by pressing the "n" (keys can be changed in settings).',
+      },
+      {
+        id: 'self-destruct',
+        text: 'If your wall or other unit is in the way, you can destroy selected units by pressing the "delete" key (keys can be changed in settings).',
+      },
     ],
   }
 })
