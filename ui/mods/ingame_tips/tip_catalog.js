@@ -1,17 +1,15 @@
 define([
   'ingame_tips/player_actions',
   'ingame_tips/triggers',
+  'ingame_tips/specs',
 ], function(
   actions,
-  trig
+  trig,
+  specs
 ) {
   "use strict";
 
-  var metal_extractor = '/pa/units/land/metal_extractor/metal_extractor.json'
-  var fabrication_aircraft = "/pa/units/air/fabrication_aircraft/fabrication_aircraft.json"
-  var fabrication_aircraft_adv = "/pa/units/air/fabrication_aircraft_adv/fabrication_aircraft_adv.json"
   var rFabrication = new RegExp('fabrication')
-  var deep_space_radar = "/pa/units/orbital/deep_space_radar/deep_space_radar.json"
 
   return {
     tips: [
@@ -61,15 +59,15 @@ define([
           var build = actions.unitBuildSequence.events()[0]
           return build &&
             actions.unitCount.peek() < 10 &&
-            (build.item == fabrication_aircraft ||
-             build.item == fabrication_aircraft_adv)
+            (build.item == specs.fabrication_aircraft ||
+             build.item == specs.fabrication_aircraft_adv)
         },
         proof: function() {
           var build = actions.unitBuildSequence.events()[0]
           return build &&
             actions.unitCount.peek() < 10 &&
-            build.item != fabrication_aircraft &&
-            build.item != fabrication_aircraft_adv &&
+            build.item != specs.fabrication_aircraft &&
+            build.item != specs.fabrication_aircraft_adv &&
             rFabrication.test(build.item)
         },
       },
@@ -127,13 +125,13 @@ define([
         trigger: function() {
           return trig.nItemEqual(5,
               actions.structureBuildSequence.events(),
-              metal_extractor) &&
+              specs.metal_extractor) &&
             !trig.peekCommanderSelected()
         },
         proof: function() {
           var build = actions.structureBuildSequence.events()[0]
           return build &&
-            build.item == metal_extractor &&
+            build.item == specs.metal_extractor &&
             build.screenDistance > 10
         },
       },
@@ -157,7 +155,7 @@ define([
         },
         proof: function() {
           var build = actions.structureBuildSequence.events()[0]
-          return build && build.item == deep_space_radar
+          return build && build.item == specs.deep_space_radar
         },
       },
       {
@@ -166,13 +164,13 @@ define([
         trigger: function() {
           return trig.nItemEqual(2,
               actions.structureBuildSequence.events(),
-              metal_extractor) &&
+              specs.metal_extractor) &&
             trig.peekCommanderSelected()
         },
         proof: function() {
           return trig.nItemEqual(2,
               actions.structureBuildSequence.events(),
-              metal_extractor) &&
+              specs.metal_extractor) &&
             !trig.peekCommanderSelected()
         },
       },
